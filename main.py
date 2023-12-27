@@ -241,4 +241,7 @@ class MainGrid(BoxLayout):
 
 
 if __name__ == "__main__":
-    MainApp().run()
+    try:
+        MainApp().run()
+    except Exception as e:
+        print(e)
