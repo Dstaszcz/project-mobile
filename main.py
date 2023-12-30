@@ -42,25 +42,8 @@ class AppLayout(BoxLayout):
             'font_name': 'DejaVuSans'
         }
 
-        self.convert_button_style = {
-            'size_hint_y': None,
-            'height': '32sp',
-            'font_size': '14sp',
-            'background_color': (0.1, 0.7, 0.3, 1),
-            'padding': [10, 10],
-            'font_name': 'DejaVuSans'
-        }
-        self.main_button_style = {
-            'size_hint_y': None,
-            'height': '50sp',
-            'font_size': '14sp',
-            'background_color': (0.1, 0.7, 0.3, 1),
-            'padding': [10, 10],
-            'font_name': 'DejaVuSans',
-            'halign': 'center',
-            'valign': 'middle'
-        }
-        self.selected_station_code = None
+        self.button = {'size_hint_y': None, 'height': '32sp', 'font_size': '14sp',
+                       'background_color': (0, 0, 0.9, 1), 'padding': [10, 10], 'font_name': 'Arial'}
 
         header_label = Label(text='Math Function Analyzer', font_size='24sp', color=(0.1, 0.7, 0.3, 1))
         self.add_widget(header_label)
@@ -94,7 +77,7 @@ class AppLayout(BoxLayout):
         self.add_widget(self.result_max_min)
 
     def create_button(self, text, on_press_handler):
-        return Button(text=text, on_press=on_press_handler, **self.convert_button_style)
+        return Button(text=text, on_press=on_press_handler, **self.button)
 
     def check_fields(self):
         function = self.function_input.text.strip()
@@ -103,20 +86,20 @@ class AppLayout(BoxLayout):
         x_max = self.x_max.text.strip()
 
         if not function:
-            self.result_label.text = 'Please enter a function.'
-            return
+            self.function_input.hint_text = 'Please enter a function.'
+            return 0, 0, 0, 0
 
         if not samples:
-            self.result_label.text = 'Please enter samples.'
-            return
+            self.samples_input.hint_text = 'Please enter samples.'
+            return 0, 0, 0, 0
 
         if not x_min:
-            self.result_label.text = 'Please enter x_min.'
-            return
+            self.x_min.hint_text = 'Please enter x_min.'
+            return 0, 0, 0, 0
 
         if not x_max:
-            self.result_label.text = 'Please enter x_max.'
-            return
+            self.x_max.hint_text = 'Please enter x_max.'
+            return 0, 0, 0, 0
 
         return str(function), int(samples), float(x_min), float(x_max)
 
