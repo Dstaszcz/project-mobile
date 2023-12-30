@@ -191,14 +191,14 @@ class AppLayout(BoxLayout):
         minimum = float(min(list_of_y))
         return maximum, minimum
 
-    @staticmethod
-    def calculate_derivative(equation, x):
+
+    def calculate_derivative(self, equation, x):
         h = 1e-5
         derivative = (equation(x + h) - equation(x)) / h
         return round(derivative, 3)
 
-    @staticmethod
-    def calculate_integral(equation, x_min, x_max):
+
+    def calculate_integral(self, equation, x_min, x_max):
         integral = 0
         step = 1e-5
         x_val = x_min
@@ -208,22 +208,6 @@ class AppLayout(BoxLayout):
             x_val += step
 
         return round(integral, 3)
-
-    @staticmethod
-    def check_multivalued(equation, x_min, x_max):
-        h = 0.1
-        values = set()
-        x = x_min
-        while x <= x_max:
-            values.add(equation(x))
-            x += h
-
-        if len(values) == (x_max - x_min) / h + 1:
-            result = f"Function is multivalued in interval: ({x_min}, {x_max})"
-        else:
-            result = f"Function is not multivalued in interval: ({x_min}, {x_max})"
-
-        return result
 
 
 if __name__ == '__main__':
