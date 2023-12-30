@@ -87,19 +87,19 @@ class AppLayout(BoxLayout):
 
         if not function:
             self.function_input.hint_text = 'Please enter a function.'
-            return 0, 0, 0, 0
-
+            return
+            
         if not samples:
             self.samples_input.hint_text = 'Please enter samples.'
-            return 0, 0, 0, 0
+            return
 
         if not x_min:
             self.x_min.hint_text = 'Please enter x_min.'
-            return 0, 0, 0, 0
-
+            return
+            
         if not x_max:
             self.x_max.hint_text = 'Please enter x_max.'
-            return 0, 0, 0, 0
+            return
 
         return str(function), int(samples), float(x_min), float(x_max)
 
