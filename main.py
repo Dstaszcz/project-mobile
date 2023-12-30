@@ -93,9 +93,6 @@ class AppLayout(BoxLayout):
         self.result_max_min = Label(text='Max:', **self.label_style)
         self.add_widget(self.result_max_min)
 
-        check_button = self.create_button('Advance options', self.check_advance)
-        self.add_widget(check_button)
-
     def create_button(self, text, on_press_handler):
         return Button(text=text, on_press=on_press_handler, **self.convert_button_style)
 
@@ -191,14 +188,14 @@ class AppLayout(BoxLayout):
         minimum = float(min(list_of_y))
         return maximum, minimum
 
-
-    def calculate_derivative(self, equation, x):
+    @staticmethod
+    def calculate_derivative(equation, x):
         h = 1e-5
         derivative = (equation(x + h) - equation(x)) / h
         return round(derivative, 3)
 
-
-    def calculate_integral(self, equation, x_min, x_max):
+    @staticmethod
+    def calculate_integral(equation, x_min, x_max):
         integral = 0
         step = 1e-5
         x_val = x_min
@@ -209,6 +206,21 @@ class AppLayout(BoxLayout):
 
         return round(integral, 3)
 
+    @staticmethod
+    def check_multivalued(equation, x_min, x_max):
+        h = 0.1
+        values = set()
+        x = x_min
+        while x <= x_max:
+            values.add(equation(x))
+            x += h
+
+        if len(values) == (x_max - x_min) / h + 1:
+            result = f"Function is multivalued in interval: ({x_min}, {x_max})"
+        else:
+            result = f"Function is not multivalued in interval: ({x_min}, {x_max})"
+
+        return result
 
 if __name__ == '__main__':
     MathFunctionAnalysis().run()
