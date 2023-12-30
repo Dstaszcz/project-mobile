@@ -1,216 +1,221 @@
-from datetime import datetime, timedelta
-
 from kivy.app import App
-from kivy.graphics import Rectangle
+from kivy.properties import partial
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
+from kivy.uix.popup import Popup
+from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
-from kivy.uix.popup import Popup
-import requests
-from kivy.uix.image import Image
-import matplotlib.pyplot as plt
-from kivy.core.window import Window
+import numpy as np
 
 
-class CurrencyConverterApp(App):
+class MathFunctionAnalysis(App):
     def build(self):
-        self.title = 'Currency Converter'
-        self.root = ConverterLayout()
+        self.title = 'Math Functions Analyzer'
+        self.root = AppLayout()
         return self.root
 
 
-class ConverterLayout(BoxLayout):
+class AppLayout(BoxLayout):
     def __init__(self, **kwargs):
-        super(ConverterLayout, self).__init__(**kwargs)
+        super(AppLayout, self).__init__(**kwargs)
 
-
-        # Content Layout
         self.orientation = 'vertical'
-        self.background_color = (0, 0.5, 0.5, 0.5)
-      #  self.spacing = 10
-      #  self.padding = 10
-
-        self.cols = 1
-        self.spacing = 5  # Odstęp między widgetami wewnątrz GridLayout
+        self.spacing = 5
         self.padding = [20, 20, 20, 20]
 
-        # Header Label
-        header_label = Label(text='Currency Converter', font_size='24sp', color=(0.1, 0.7, 0.3, 1))
-        self.add_widget(header_label)
-
-        # Content Layout
-      ##  content_layout = BoxLayout(orientation='horizontal', spacing=10, padding=[20, 20, 20, 20])
-
         self.text_input_style = {
-            'background_color': (1, 1, 1, 1),  # Granatowe miejsce do wpisywania
+            'background_color': (1, 1, 1, 1),
             'multiline': False,
-            'font_size': '18sp',
+            'font_size': '12sp',
             'padding': [10, 10],
             'size_hint_y': None,
-            'height': '32sp',  # Zmniejszona wysokość
+            'height': '32sp',
             'border': (0, 20, 20, 20),
             'font_name': 'DejaVuSans'
         }
 
         self.label_style = {
-            'font_size': '14sp',
+            'font_size': '10sp',
             'color': (0.1, 0.7, 0.3, 1),
             'font_name': 'DejaVuSans'
         }
 
-        self.button_style = {
+        self.convert_button_style = {
             'size_hint_y': None,
-            'height': '32sp',  # Zmniejszona wysokość
-            'font_size': '14sp',  # Zmniejszona wielkość czcionki
-            'background_color': (0.1, 0.7, 0.3, 1),
-            'font_name': 'DejaVuSans'
-        }
-        self.convert_button = {
-            'size_hint_y': None,
-           # 'size_hint_x': '5sp',
-            'height': '32sp',  # Zmniejszona wysokość
-            'font_size': '14sp',  # Zmniejszona wielkość czcionki
+            'height': '32sp',
+            'font_size': '14sp',
             'background_color': (0.1, 0.7, 0.3, 1),
             'padding': [10, 10],
             'font_name': 'DejaVuSans'
         }
+        self.main_button_style = {
+            'size_hint_y': None,
+            'height': '50sp',
+            'font_size': '14sp',
+            'background_color': (0.1, 0.7, 0.3, 1),
+            'padding': [10, 10],
+            'font_name': 'DejaVuSans',
+            'halign': 'center',
+            'valign': 'middle'
+        }
+        self.selected_station_code = None
 
-        amount_label = Label(text='Amount:', **self.label_style)
-        amount_label.size_hint_y = None  # Wymuszamy, aby wysokość etykiety była taka, jak jej zawartość
-        amount_label.height = '10sp'
-        self.amount_input = TextInput(hint_text='Enter Amount', **self.text_input_style)
-        self.add_widget(amount_label)
-        self.add_widget(self.amount_input)
+        header_label = Label(text='Math Function Analyzer', font_size='24sp', color=(0.1, 0.7, 0.3, 1))
+        self.add_widget(header_label)
 
-        # Add Currency Inputs
-        content_layout = BoxLayout(orientation='horizontal', spacing=10)
+        self.function_input = TextInput(hint_text='Enter your math function', **self.text_input_style)
+        self.samples_input = TextInput(hint_text='Enter samples', **self.text_input_style)
+        self.x_min = TextInput(hint_text='Enter x_min', **self.text_input_style)
+        self.x_max = TextInput(hint_text='Enter x_max', **self.text_input_style)
+        self.station_code_label = Label(text='Selected Station: None', **self.label_style)
+        self.add_widget(self.function_input)
+        self.add_widget(self.samples_input)
+        self.add_widget(self.x_min)
+        self.add_widget(self.x_max)
 
-  ##      self.amount_input = TextInput(hint_text='Enter Amount', **self.text_input_style)
-
-  ##      content_layout.add_widget(self.amount_input)
-   ##     self.add_widget(content_layout)
-
-
-
-        self.from_currency_input = TextInput(hint_text='From Currency (e.g., USD)', **self.text_input_style)
-        self.to_currency_input = TextInput(hint_text='To Currency (e.g., PLN)', **self.text_input_style)
-
-        content_layout.add_widget(self.from_currency_input)
-        image = (Image(source='twoarrows.png'))
-        image.size_hint = (None, None)
-        image.size = (60, 60)
-        content_layout.add_widget(image)
-
-        # Zmodyfikuj ścieżkę do własnej grafik
-        content_layout.add_widget(self.to_currency_input)
-        self.add_widget(content_layout)
-
-
-        # Add the Content Layout to the Main Layout
-        convert_button = Button(text='Convert', on_press=self.convert_currency, **self.convert_button)
-        self.add_widget(convert_button)
-
-
-        self.result_label = Label(text='Converted Amount: ', **self.label_style)
+        self.result_label = Label(text='123', **self.label_style)
         self.add_widget(self.result_label)
 
+        check_button = self.create_button('Calculate your function', self.check_math_function)
+        self.add_widget(check_button)
 
+        self.result_domain = Label(text='Domain of function:', **self.label_style)
+        self.add_widget(self.result_domain)
 
-        plot_button = Button(text='Show Trends', on_press=self.show_trends, **self.button_style)
-        self.add_widget(plot_button)
+        self.result_set_of_values = Label(text='Set of values:', **self.label_style)
+        self.add_widget(self.result_set_of_values)
 
-        history_button = Button(text='Show History', on_press=self.show_history, **self.button_style)
-        self.add_widget(history_button)
-        self.conversion_history = []
+        self.result_roots = Label(text='Roots:', **self.label_style)
+        self.add_widget(self.result_roots)
 
+        self.result_max_min = Label(text='Max:', **self.label_style)
+        self.add_widget(self.result_max_min)
 
-    def convert_currency(self, instance):
-        try:
-            amount = float(self.amount_input.text)
-            from_currency = self.from_currency_input.text.upper()
-            to_currency = self.to_currency_input.text.upper()
+        check_button = self.create_button('Advance options', self.check_advance)
+        self.add_widget(check_button)
 
-            if from_currency == 'PLN':
-                amount_in_pln = amount
-            else:
-                api_url = f'https://api.nbp.pl/api/exchangerates/rates/A/{from_currency}/?format=json'
-                response = requests.get(api_url)
-                data = response.json()
-                exchange_rate = data['rates'][0]['mid']
-                amount_in_pln = amount * exchange_rate
+    def create_button(self, text, on_press_handler):
+        return Button(text=text, on_press=on_press_handler, **self.convert_button_style)
 
-            if to_currency == 'PLN':
-                converted_amount = amount_in_pln
-            else:
-                api_url_to_currency = f'https://api.nbp.pl/api/exchangerates/rates/A/{to_currency}/?format=json'
-                response_to_currency = requests.get(api_url_to_currency)
-                data_to_currency = response_to_currency.json()
-                exchange_rate_to_currency = data_to_currency['rates'][0]['mid']
-                converted_amount = amount_in_pln / exchange_rate_to_currency
+    def check_fields(self):
+        function = self.function_input.text.strip()
+        samples = self.samples_input.text.strip()
+        x_min = self.x_min.text.strip()
+        x_max = self.x_max.text.strip()
 
-            self.result_label.text = f'Converted Amount: {converted_amount:.2f} {to_currency}'
-            conversion_entry = f'{amount:.2f} {from_currency} => {converted_amount:.2f} {to_currency}'
-            self.conversion_history.append(conversion_entry)
-
-        except (ValueError, requests.RequestException):
-            self.result_label.text = 'Invalid input or unable to fetch exchange rate'
-
-    def show_history(self, instance):
-        if not self.conversion_history:
-            self.result_label.text = 'No conversion history available.'
+        if not function:
+            self.result_label.text = 'Please enter a function.'
             return
 
-        # Display history in a popup
-        history_text = '\n'.join(self.conversion_history)
-        history_label = Label(text=history_text, **self.label_style)
-        history_popup_content = BoxLayout(orientation='vertical')
-        history_popup_content.add_widget(history_label)
-        history_popup = Popup(title='Conversion History', content=history_popup_content, size_hint=(0.9, 0.9))
-        history_popup.open()
-    def show_trends(self, instance):
-        from_currency = self.from_currency_input.text
-
-        if not from_currency:
-            self.result_label.text = 'Please enter valid values.'
+        if not samples:
+            self.result_label.text = 'Please enter samples.'
             return
 
-        try:
-            # Pobierz 30 dni kursów waluty z API NBP
-            end_date = datetime.now().strftime('%Y-%m-%d')
-            start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+        if not x_min:
+            self.result_label.text = 'Please enter x_min.'
+            return
 
-            nbp_chart_api_url = f'http://api.nbp.pl/api/exchangerates/rates/a/{from_currency}/{start_date}/{end_date}/?format=json'
-            response = requests.get(nbp_chart_api_url)
-            data = response.json()
+        if not x_max:
+            self.result_label.text = 'Please enter x_max.'
+            return
 
-            # Tworzenie wykresu
-            dates = [entry['effectiveDate'] for entry in data['rates']]
-            rates = [entry['mid'] for entry in data['rates']]
+        return str(function), int(samples), float(x_min), float(x_max)
 
-            plt.figure(figsize=(8, 6))
-            plt.plot(dates, rates, marker='o')
-            plt.title(f'Currency Changes for {from_currency} in the Last 30 Days')
-            plt.xlabel('Date')
-            plt.ylabel('Mid Rate')
-            plt.xticks(rotation=45)
-            plt.tight_layout()
+    def check_math_function(self, instance):
+        function, samples, x_min, x_max = self.check_fields()
+        function_2 = lambda x: eval(function)
 
-            # Zapisz wykres do pliku obrazu
-            plot_filename = 'currency_changes_plot.png'
-            plt.savefig(plot_filename)
-            plt.close()
+        domain_of_function = self.find_domain_of_function(x_min, x_max)
+        self.result_domain.text = "Domain of function is: " + domain_of_function
 
-            # Wyświetlenie wykresu jako obrazu
-            plot_image = Image(source=plot_filename)
-            popup_content = BoxLayout(orientation='vertical')
-            popup_content.add_widget(plot_image)
-            popup = Popup(title='Currency Changes Plot', content=popup_content, size_hint=(0.9, 0.9))
-            popup.open()
+        set_of_values = self.find_set_of_values(function_2, x_min, x_max, samples)
+        self.result_set_of_values.text = f"Set of values is: {set_of_values}"
 
-        except Exception as e:
-            self.result_label.text = f'Failed to retrieve currency data for the plot. Error: {str(e)}'
+        roots = self.find_roots(function_2, x_min, x_max, samples)
+        self.result_roots.text = f"Roots of function are: {roots}"
+
+        maximum, minimum = self.find_maximum_and_minimum_of_function(function_2, x_min, x_max, samples)
+        self.result_max_min.text = f"Maximum of function: {maximum}, Minimum of function: {minimum}"
+
+        # Oblicz pochodną
+        derivative = self.calculate_derivative(function_2)
+        print(derivative)
+
+        # Oblicz całkę
+        integral = self.calculate_integral(function_2, x_min, x_max)
+        print(integral)
+
+        return roots, derivative, integral
+
+        # try:
+        #   except requests.RequestException as e:
+        #       self.result_label.text = f'Error: {str(e)}'
+
+    # Dziedzina, zbiór wartości, miejsca zerowe, monotoniczność, różnowartościowość, parzystość, maksimum, minimum
+    def check_advance(self, instance):
+        self.result_label.text ='Please enter a function.'
+
+    @staticmethod
+    def find_domain_of_function(x_min, x_max):
+        return f"<{x_min}: {x_max}>"
+
+    @staticmethod
+    def find_set_of_values(equation, x_min, x_max, samples):
+        list_of_x = np.linspace(x_min, x_max, samples)
+        set_of_values = []
+        for x in list_of_x:
+            x = round(x, 2)
+            y = equation(x)
+            y = round(y, 2)
+            value = f"({x}:{y})"
+            set_of_values.append(value)
+        return set_of_values
+
+    @staticmethod
+    def find_roots(equation, x_min, x_max, samples):
+        roots = []
+        list_of_x = np.linspace(x_min, x_max, samples)
+
+        for x in list_of_x:
+            x_val = round(x, 2)
+            if equation(x_val) == 0:
+                roots.append(x_val)
+
+        if not roots:
+            roots = "No roots"
+        return roots
+
+    @staticmethod
+    def find_maximum_and_minimum_of_function(equation, x_min, x_max, samples):
+        list_of_x = np.linspace(x_min, x_max, samples)
+        list_of_y = []
+        for x in list_of_x:
+            x = round(x, 2)
+            y = equation(x)
+            list_of_y.append(y)
+        maximum = float(max(list_of_y))
+        minimum = float(min(list_of_y))
+        return maximum, minimum
+
+    def calculate_derivative(self, equation):
+        h = 1e-5
+        x = 1
+        derivative = (equation(x + h) - equation(x)) / h
+        return derivative
+
+    def calculate_integral(self, equation, x_min, x_max):
+        integral = 0
+        step = 1e-5
+        x_val = x_min
+
+        while x_val < x_max:
+            integral += equation(x_val) * step
+            x_val += step
+
+        return integral
 
 
 if __name__ == '__main__':
-    CurrencyConverterApp().run()
+    MathFunctionAnalysis().run()
