@@ -43,7 +43,7 @@ class AppLayout(BoxLayout):
         }
 
         self.button = {'size_hint_y': None, 'height': '32sp', 'font_size': '14sp',
-                       'background_color': (0, 0, 0.9, 1), 'padding': [10, 10], 'font_name': 'Arial'}
+                       'background_color': (0, 0, 0.9, 1), 'padding': [10, 10]}
 
         header_label = Label(text='Math Function Analyzer', font_size='24sp', color=(0.1, 0.7, 0.3, 1))
         self.add_widget(header_label)
@@ -87,24 +87,26 @@ class AppLayout(BoxLayout):
 
         if not function:
             self.function_input.hint_text = 'Please enter a function.'
-            return
-            
+            return 0, 0, 0, 0
+
         if not samples:
             self.samples_input.hint_text = 'Please enter samples.'
-            return
+            return 0, 0, 0, 0
 
         if not x_min:
             self.x_min.hint_text = 'Please enter x_min.'
-            return
-            
+            return 0, 0, 0, 0
+
         if not x_max:
             self.x_max.hint_text = 'Please enter x_max.'
-            return
+            return 0, 0, 0, 0
 
         return str(function), int(samples), float(x_min), float(x_max)
 
     def check_math_function(self, instance):
         function, samples, x_min, x_max = self.check_fields()
+        if function == 0 or samples == 0:
+            return 0
         function_2 = lambda x: eval(function)
 
         domain_of_function = self.find_domain_of_function(x_min, x_max)
