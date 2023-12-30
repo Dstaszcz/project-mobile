@@ -1,10 +1,10 @@
 [app]
 
 # (str) Title of your application
-title = Air Quality Checker
+title = MathFunctionApp
 
 # (str) Package name
-package.name = airqualitychecker
+package.name = mathfunctionapp
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = org.test
@@ -37,7 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3==3.9.13,hostpython3==3.9.13,kivy,requests, matplotlib
+requirements = python3==3.9.13,hostpython3==3.9.13,kivy,numpy
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
