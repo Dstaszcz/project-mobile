@@ -1,10 +1,6 @@
 from kivy.app import App
-from kivy.properties import partial
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
-from kivy.uix.popup import Popup
-from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 import numpy as np
@@ -23,81 +19,60 @@ class AppLayout(BoxLayout):
 
         self.orientation = 'vertical'
         self.spacing = 5
-        self.padding = [20, 20, 20, 20]
+        self.padding = 20
 
-        self.text_input_style = {
-            'background_color': (1, 1, 1, 1),
-            'multiline': False,
-            'font_size': '12sp',
-            'padding': [10, 10],
-            'size_hint_y': None,
-            'height': '32sp',
-            'border': (0, 20, 20, 20),
-            'font_name': 'DejaVuSans'
-        }
+        self.text = {'background_color': (1, 1, 1, 0.9), 'font_size': '12sp', 'border': (0, 10, 10, 10),
+                     'font_name': 'Arial'}
 
-        self.label_style = {
-            'font_size': '10sp',
-            'color': (0.1, 0.7, 0.3, 1),
-            'font_name': 'DejaVuSans'
-        }
+        self.button = {'size_hint_y': None, 'height': '32sp', 'font_size': '14sp',
+                       'background_color': (0, 0, 0.9, 1), 'padding': [10, 10], 'font_name': 'Arial'}
 
-        self.convert_button_style = {
-            'size_hint_y': None,
-            'height': '32sp',
-            'font_size': '14sp',
-            'background_color': (0.1, 0.7, 0.3, 1),
-            'padding': [10, 10],
-            'font_name': 'DejaVuSans'
-        }
-        self.main_button_style = {
-            'size_hint_y': None,
-            'height': '50sp',
-            'font_size': '14sp',
-            'background_color': (0.1, 0.7, 0.3, 1),
-            'padding': [10, 10],
-            'font_name': 'DejaVuSans',
-            'halign': 'center',
-            'valign': 'middle'
-        }
-        self.selected_station_code = None
+        self.header_label = Label(text='Math Function Analyzer', height=50, size_hint=(1, None), font_size='28sp',
+                                  color=(1, 1, 1, 0.9))
+        self.blank = Label(height=50, color=(1, 1, 1, 0.9))
+        self.add_widget(self.blank)
 
-        header_label = Label(text='Math Function Analyzer', font_size='24sp', color=(0.1, 0.7, 0.3, 1))
-        self.add_widget(header_label)
+        self.function_input = TextInput(hint_text='Enter your math function', **self.text)
+        self.samples_input = TextInput(hint_text='Enter samples', **self.text)
+        self.x_min = TextInput(hint_text='Enter x_min', **self.text)
+        self.x_max = TextInput(hint_text='Enter x_max', **self.text)
 
-        self.function_input = TextInput(hint_text='Enter your math function', **self.text_input_style)
-        self.samples_input = TextInput(hint_text='Enter samples', **self.text_input_style)
-        self.x_min = TextInput(hint_text='Enter x_min', **self.text_input_style)
-        self.x_max = TextInput(hint_text='Enter x_max', **self.text_input_style)
-        self.station_code_label = Label(text='Selected Station: None', **self.label_style)
+        self.add_widget(self.header_label)
         self.add_widget(self.function_input)
         self.add_widget(self.samples_input)
         self.add_widget(self.x_min)
         self.add_widget(self.x_max)
 
-        self.result_label = Label(text='123', **self.label_style)
-        self.add_widget(self.result_label)
+        self.blank = Label(height=50, color=(1, 1, 1, 0.9))
+        self.add_widget(self.blank)
 
-        check_button = self.create_button('Calculate your function', self.check_math_function)
-        self.add_widget(check_button)
+        self.check_button = self.create_button('Calculate your function', self.check_math_function)
+        self.add_widget(self.check_button)
 
-        self.result_domain = Label(text='Domain of function:', **self.label_style)
+        self.blank = Label(height=50, color=(1, 1, 1, 0.9))
+        self.add_widget(self.blank)
+
+        self.result_domain = TextInput(hint_text='Domain of function:', **self.text)
+        self.result_set_of_values = TextInput(hint_text='Set of values:', **self.text)
+        self.result_roots = TextInput(hint_text='Roots:', **self.text)
+        self.result_max_min = TextInput(hint_text='Max: Min:', **self.text)
+        self.result_multivalued = TextInput(hint_text="Is function multivalued?", **self.text)
+        self.result_derivative = TextInput(hint_text="Derivative in x_min: and x_max:", **self.text)
+        self.result_internal = TextInput(hint_text="Definite integral in the interval x_min;x_max: ", **self.text)
+
         self.add_widget(self.result_domain)
-
-        self.result_set_of_values = Label(text='Set of values:', **self.label_style)
         self.add_widget(self.result_set_of_values)
-
-        self.result_roots = Label(text='Roots:', **self.label_style)
         self.add_widget(self.result_roots)
-
-        self.result_max_min = Label(text='Max:', **self.label_style)
         self.add_widget(self.result_max_min)
+        self.add_widget(self.result_multivalued)
+        self.add_widget(self.result_derivative)
+        self.add_widget(self.result_internal)
 
-        check_button = self.create_button('Advance options', self.check_advance)
-        self.add_widget(check_button)
+        self.blank = Label(height=50, color=(1, 1, 1, 0.9))
+        self.add_widget(self.blank)
 
     def create_button(self, text, on_press_handler):
-        return Button(text=text, on_press=on_press_handler, **self.convert_button_style)
+        return Button(text=text, on_press=on_press_handler, **self.button)
 
     def check_fields(self):
         function = self.function_input.text.strip()
@@ -106,32 +81,41 @@ class AppLayout(BoxLayout):
         x_max = self.x_max.text.strip()
 
         if not function:
-            self.result_label.text = 'Please enter a function.'
-            return
+            self.function_input.hint_text = 'Please enter a function.'
+            return 0, 0, 0, 0
 
         if not samples:
-            self.result_label.text = 'Please enter samples.'
-            return
+            self.samples_input.hint_text = 'Please enter samples.'
+            return 0, 0, 0, 0
 
         if not x_min:
-            self.result_label.text = 'Please enter x_min.'
-            return
+            self.x_min.hint_text = 'Please enter x_min.'
+            return 0, 0, 0, 0
 
         if not x_max:
-            self.result_label.text = 'Please enter x_max.'
-            return
+            self.x_max.hint_text = 'Please enter x_max.'
+            return 0, 0, 0, 0
 
         return str(function), int(samples), float(x_min), float(x_max)
 
     def check_math_function(self, instance):
         function, samples, x_min, x_max = self.check_fields()
+        if function == 0 or samples == 0:
+            return 0
         function_2 = lambda x: eval(function)
 
         domain_of_function = self.find_domain_of_function(x_min, x_max)
         self.result_domain.text = "Domain of function is: " + domain_of_function
 
         set_of_values = self.find_set_of_values(function_2, x_min, x_max, samples)
-        self.result_set_of_values.text = f"Set of values is: {set_of_values}"
+        if len(set_of_values) > 6:
+            middle_len = int(len(set_of_values) / 2)
+            self.result_set_of_values.text = (f"Set of values is (too many values to show all): [{set_of_values[0]}, "
+                                              f"{set_of_values[middle_len - 1]}, "
+                                              f"{set_of_values[middle_len + 1]}, "
+                                              f"{set_of_values[-1]}]")
+        else:
+            self.result_set_of_values.text = f"Set of values is: {set_of_values}"
 
         roots = self.find_roots(function_2, x_min, x_max, samples)
         self.result_roots.text = f"Roots of function are: {roots}"
@@ -139,23 +123,15 @@ class AppLayout(BoxLayout):
         maximum, minimum = self.find_maximum_and_minimum_of_function(function_2, x_min, x_max, samples)
         self.result_max_min.text = f"Maximum of function: {maximum}, Minimum of function: {minimum}"
 
-        # Oblicz pochodną
-        derivative = self.calculate_derivative(function_2)
-        print(derivative)
+        multivalued = self.check_multivalued(function_2, x_min, x_max)
+        self.result_multivalued.text = multivalued
 
-        # Oblicz całkę
+        derivative_min = self.calculate_derivative(function_2, x_min)
+        derivative_max = self.calculate_derivative(function_2, x_max)
+        self.result_derivative.text = f"Derivative in x_min: {derivative_min} and x_max: {derivative_max}"
+
         integral = self.calculate_integral(function_2, x_min, x_max)
-        print(integral)
-
-        return roots, derivative, integral
-
-        # try:
-        #   except requests.RequestException as e:
-        #       self.result_label.text = f'Error: {str(e)}'
-
-    # Dziedzina, zbiór wartości, miejsca zerowe, monotoniczność, różnowartościowość, parzystość, maksimum, minimum
-    def check_advance(self, instance):
-        self.result_label.text ='Please enter a function.'
+        self.result_internal.text = f"Definite integral in the interval x_min;x_max: {integral}"
 
     @staticmethod
     def find_domain_of_function(x_min, x_max):
@@ -199,13 +175,14 @@ class AppLayout(BoxLayout):
         minimum = float(min(list_of_y))
         return maximum, minimum
 
-    def calculate_derivative(self, equation):
+    @staticmethod
+    def calculate_derivative(equation, x):
         h = 1e-5
-        x = 1
         derivative = (equation(x + h) - equation(x)) / h
-        return derivative
+        return round(derivative, 3)
 
-    def calculate_integral(self, equation, x_min, x_max):
+    @staticmethod
+    def calculate_integral(equation, x_min, x_max):
         integral = 0
         step = 1e-5
         x_val = x_min
@@ -214,7 +191,23 @@ class AppLayout(BoxLayout):
             integral += equation(x_val) * step
             x_val += step
 
-        return integral
+        return round(integral, 3)
+
+    @staticmethod
+    def check_multivalued(equation, x_min, x_max):
+        h = 0.1
+        values = set()
+        x = x_min
+        while x <= x_max:
+            values.add(equation(x))
+            x += h
+
+        if len(values) == (x_max - x_min) / h + 1:
+            result = f"Function is multivalued in interval: ({x_min}, {x_max})"
+        else:
+            result = f"Function is not multivalued in interval: ({x_min}, {x_max})"
+
+        return result
 
 
 if __name__ == '__main__':
